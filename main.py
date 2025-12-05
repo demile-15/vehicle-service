@@ -4,16 +4,27 @@ from database import SessionLocal
 from models import Vehicle
 from schemas import VehicleCreate, VehicleResponse
 
-# create table Vehicle on startup if it didn't exist
-# Base.metadata.create_all(bind=engine)
+from contextlib import asynccontextmanager
 
-app = FastAPI(title="Vehicle Service")
-
-@app.on_event("startup")
-def startup():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    A startup hook that gets called by FastAPI when the server starts.
+    Tables get created automatically on app boot.
+    """
     from database import engine
     from models import Base
     Base.metadata.create_all(bind=engine)
+    yield  # separates "startup" from "shutdown".
+
+# @app.on_event("startup")
+# def startup():
+#     # create table Vehicle on startup if it didn't exist
+#     from database import engine
+#     from models import Base
+#     Base.metadata.create_all(bind=engine)
+
+app = FastAPI(title="Vehicle Service", lifespan=lifespan)
 
 def get_db():
     """
@@ -63,7 +74,7 @@ def create_vehicle(vehicle: VehicleCreate, db: Session = Depends(get_db)):
     return new_vehicle
 
 
-@app.get("/vehicle{vin}", response_model=VehicleResponse)
+@app.get("/vehicle/{vin}", response_model=VehicleResponse)
 def get_vehicle(vin: str, db: Session = Depends(get_db)):
     """
     Retrieve a single vehicle by VIN.
