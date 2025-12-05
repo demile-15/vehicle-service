@@ -24,10 +24,6 @@ def get_all_vehicles(db: Session = Depends(get_db)):
 
     Returns:
         List[VehicleResponse]: A list of all vehicle records in JSON format.
-
-    Notes:
-        - Response status: 200 OK (default)
-        - Uses the VehicleResponse schema to structure the response.
     """
     return db.query(Vehicle).all()
 
@@ -45,10 +41,6 @@ def create_vehicle(vehicle: VehicleCreate, db: Session = Depends(get_db)):
 
     Raises:
         HTTPException 422: If VIN already exists in the database.
-
-    Notes:
-        - Response status: 201 Created
-        - Validates request body using VehicleCreate schema.
     """
     # enforce VIN uniqueness (case-insensitive)
     existing = db.query(Vehicle).filter(Vehicle.vin.ilike(vehicle.vin)).first()
@@ -75,10 +67,6 @@ def get_vehicle(vin: str, db: Session = Depends(get_db)):
 
     Raises:
         HTTPException 404: If no vehicle with the given VIN exists.
-
-    Notes:
-        - Response status: 200 OK (default)
-        - VIN lookup is case-insensitive.
     """
     # search for a case-insensitive match in Vehicle DB
     vehicle = db.query(Vehicle).filter(Vehicle.vin.ilike(vin)).first()
@@ -102,10 +90,6 @@ def update_vehicle(vin: str, vehicle: VehicleCreate, db: Session = Depends(get_d
 
     Raises:
         HTTPException 404: If vehicle does not exist.
-
-    Notes:
-        - Response status: 200 OK (default)
-        - VIN comparison is case-insensitive.
     """
     # find vehicle by VIN (case-insensitive)
     existing_vehicle = db.query(Vehicle).filter(Vehicle.vin.ilike(vin)).first()
@@ -118,3 +102,25 @@ def update_vehicle(vin: str, vehicle: VehicleCreate, db: Session = Depends(get_d
     db.commit()
     db.refresh(existing_vehicle)
     return existing_vehicle
+
+@app.delete("/vehicle/{vin}", status_code=204)
+def delete_vehicle(vin: str, db: Session = Depends(get_db)):
+    """
+    Delete a single vehicle by VIN.
+
+    Args:
+        vin (str): The VIN of the vehicle to fetch.
+
+    Returns:
+        None (204 No Content on success)
+
+    Raises:
+        HTTPException 204: If no vehicle with the given VIN exists.
+    """
+    vehicle = db.query(Vehicle).filter(Vehicle.vin.ilike(vin)).first()
+    if not vehicle:
+        raise HTTPException(status_code=404, detail="Vehicle not found")
+    
+    db.delete(vehicle)
+    db.commit()
+    return
