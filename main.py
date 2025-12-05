@@ -16,6 +16,7 @@ def get_db():
     finally:
         db.close()
 
+
 @app.get("/vehicle", response_model=list[VehicleResponse]) # default "200 OK"
 def get_all_vehicles(db: Session = Depends(get_db)): 
     """
@@ -29,6 +30,7 @@ def get_all_vehicles(db: Session = Depends(get_db)):
         - Uses the VehicleResponse schema to structure the response.
     """
     return db.query(Vehicle).all()
+
 
 @app.post("/vehicle", response_model=VehicleResponse, status_code=201)
 def create_vehicle(vehicle: VehicleCreate, db: Session = Depends(get_db)):
@@ -53,11 +55,12 @@ def create_vehicle(vehicle: VehicleCreate, db: Session = Depends(get_db)):
     if existing:
         raise HTTPException(status_code=422, detail="VIN already exists")
 
-    new_vehicle = Vehicle(**vehicle.dict())
+    new_vehicle = Vehicle(**vehicle.model_dump())
     db.add(new_vehicle)
     db.commit()
     db.refresh(new_vehicle)  # gets updated version from DB
     return new_vehicle
+
 
 @app.get("/vehicle{vin}", response_model=VehicleResponse)
 def get_vehicle(vin: str, db: Session = Depends(get_db)):
@@ -83,3 +86,35 @@ def get_vehicle(vin: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Vehicle not found")
 
     return vehicle
+
+
+@app.put("/vehicle/{vin}", response_model=VehicleResponse)
+def update_vehicle(vin: str, vehicle: VehicleCreate, db: Session = Depends(get_db)):
+    """
+    Update an existing vehicle by VIN.
+
+    Args:
+        vin (str): VIN of the vehicle to update.
+        vehicle (VehicleCreate): Updated vehicle fields from request body.
+
+    Returns:
+        VehicleResponse: Updated vehicle data.
+
+    Raises:
+        HTTPException 404: If vehicle does not exist.
+
+    Notes:
+        - Response status: 200 OK (default)
+        - VIN comparison is case-insensitive.
+    """
+    # find vehicle by VIN (case-insensitive)
+    existing_vehicle = db.query(Vehicle).filter(Vehicle.vin.ilike(vin)).first()
+    if not existing_vehicle:
+        raise HTTPException(status_code=404, detail="Vehicle not found")
+
+    # update fields:
+    for key, value in vehicle.model_dump().items():
+        setattr(existing_vehicle, key, value)
+    db.commit()
+    db.refresh(existing_vehicle)
+    return existing_vehicle
