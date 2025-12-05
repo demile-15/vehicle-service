@@ -1,28 +1,54 @@
 # Vehicle Database Web Service
+This project implements a RESTful web service that provides CRUD-style API access to stored vehicle records.
+It was built using `FastAPI`, `SQLAlchemy`, and `SQLite`, and includes basic automated tests using `pytest`.
 
-Step 1: Create database and table model
+## Features
+| Endpoint         | Description           | Method | Status         |
+| ---------------- | --------------------- | ------ | -------------- |
+| `/vehicle`       | Get all vehicles      | GET    | 200 OK         |
+| `/vehicle`       | Create a vehicle      | POST   | 201 Created    |
+| `/vehicle/{vin}` | Get vehicle by VIN    | GET    | 200 OK         |
+| `/vehicle/{vin}` | Update vehicle by VIN | PUT    | 200 OK         |
+| `/vehicle/{vin}` | Delete vehicle by VIN | DELETE | 204 No Content |
 
-- `database.py`: Create a database connection using SQLAlchemy's create_engine(). This returns an Engine object that establishes connection to a database.
+Additional behaviors:
+- VIN is used as the primary identifier (case-insensitive)
+- Validates JSON payload using Pydantic models
+- Returns 400/422 on malformed input
+- Returns 404 for missing VIN
+- Tested via pytest
 
-- `models.py`: Define the Vehicle table
+## Tech Stack
+- FastAPI: web framework for building APIs
+- SQLAlchemy: ORM and database layer
+- SQLite: simple local persistent DB
+- pytest: automated test runner
+- Uvicorn: ASGI server to run FastAPI
 
-+ Make a class Vehicle
-+ Run
-`
-python3
->>> from database import Base, engine
->>> from models import Vehicle
->>> Base.metadata.create_all(engine)
-`
+## Running the App
+**1. Install dependencies**
+```
+pip install -r requirements.txt
+```
 
-Step 2: Create request/response validation models `schemas.py`
-The validation models ensure JSON input is valid and help return 400/422 errors automatically.
+**2. Start the server**
+```
+uvicorn main:app --reload
+```
 
-Step 3: Build API Endpoints
-- Start a FastAPI server
-- Implement endpoints: GET/vehicle, 
+**3. Open interactive API docs:**
+```
+http://localhost:8000/docs
+```
 
-# API Endpoints
-### GET/vehicle
+From here, you can test all endpoints via Swagger UI.
 
-### GET/vehicle/{vin}
+## Running Tests
+Run `pytest -q` to run unit tests.
+
+
+## Future Improvements
+Given more time, I'd implement the following:
+- Independent in-memory DB for `pytest` runs.
+- More extensive test coverage (+ failure case tests).
+- Optional AWS deployment.
