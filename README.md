@@ -2,6 +2,8 @@
 This project implements a RESTful web service that provides CRUD-style API access to stored vehicle records.
 It was built using `FastAPI`, `SQLAlchemy`, and `SQLite`, and includes basic automated tests using `pytest`.
 
+![API Service Architecture](architecture.jpg "API Service Architecture")
+
 ## Features
 | Endpoint         | Description           | Method | Status         |
 | ---------------- | --------------------- | ------ | -------------- |
@@ -31,12 +33,17 @@ Additional behaviors:
 pip install -r requirements.txt
 ```
 
-**2. Start the server**
+**2. Activate virtual environment**
+```
+source venv/bin/activate
+```
+
+**3. Start the server**
 ```
 uvicorn main:app --reload
 ```
 
-**3. Open interactive API docs:**
+**4. Open interactive API docs:**
 ```
 http://localhost:8000/docs
 ```
