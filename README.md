@@ -2,9 +2,9 @@
 
 Step 1: Create database and table model
 
-- `database.py`: Uses SQLAlchemy's create_engine() to make an Engine object that establishes connection to a database.
+- `database.py`: Create a database connection using SQLAlchemy's create_engine(). This returns an Engine object that establishes connection to a database.
 
-- `models.py`: Define the Vehicle DB table
+- `models.py`: Define the Vehicle table
 
 + Make a class Vehicle
 + Run
@@ -19,3 +19,10 @@ Step 2: Create request/response validation models `schemas.py`
 The validation models ensure JSON input is valid and help return 400/422 errors automatically.
 
 Step 3: Build API Endpoints
+- Start a FastAPI server
+- Implement endpoints: GET/vehicle, 
+
+# API Endpoints
+### GET/vehicle
+
+### GET/vehicle/{vin}
