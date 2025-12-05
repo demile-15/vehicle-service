@@ -8,7 +8,6 @@ DATABASE_URL = "sqlite:///./vehicles.db"  # use sqlite
 # to handle requests -> need different parts of the app to talk to SQLite safely.
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})  
 
-
 # create a temporary session to connect to the database
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 

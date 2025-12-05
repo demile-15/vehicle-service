@@ -1,6 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 
-class VehicleBase(BaseModel):
+class VehicleRequest(BaseModel):
     manufacturer_name: str
     description: str
     horse_power: int
@@ -9,10 +9,10 @@ class VehicleBase(BaseModel):
     purchase_price: float
     fuel_type: str
 
-class VehicleCreate(VehicleBase):
+class VehicleUpdate(VehicleRequest):
     vin: str
 
-class VehicleResponse(VehicleBase):
+class VehicleResponse(VehicleRequest):
     vin: str
 
     # allow SQLAlchemy objects to be converted to JSON responses
