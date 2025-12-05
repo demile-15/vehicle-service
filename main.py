@@ -4,7 +4,16 @@ from database import SessionLocal
 from models import Vehicle
 from schemas import VehicleCreate, VehicleResponse
 
+# create table Vehicle on startup if it didn't exist
+# Base.metadata.create_all(bind=engine)
+
 app = FastAPI(title="Vehicle Service")
+
+@app.on_event("startup")
+def startup():
+    from database import engine
+    from models import Base
+    Base.metadata.create_all(bind=engine)
 
 def get_db():
     """
